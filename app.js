@@ -30,8 +30,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // connect to mongodb
-mongoose.connect(dbURI, () => {
-  console.log('connected to mongodb');
+mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true }, () => {
+  console.log('Connected to mongodb');
 })
 
 app.use(logger('dev'));
