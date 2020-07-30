@@ -5,7 +5,7 @@ const User = require('../models/User');
 
 // get current auth user
 router.get('/user', (req, res) => {
-    console.log(req.user);
+    // console.log(req.user);
     res.send(req.user);
 });
 
@@ -13,7 +13,6 @@ router.get('/user', (req, res) => {
 router.get('/google', passport.authenticate('google', {
     scope: ['profile']
 }, (req, res) => {
-    console.log("made it here");
 }));
 
 // callback route for google to redirect to
