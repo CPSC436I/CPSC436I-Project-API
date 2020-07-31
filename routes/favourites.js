@@ -1,38 +1,59 @@
 var express = require('express');
 var router = express.Router();
-const Favourite = require('../models/Favourite');
+const UserFavourite = require('../models/UserFavourite');
+const passport = require('passport');
 
 /* GET favourites listing. */
 router.get('/', function(req, res, next) {
-    Favourite.find()
-    .then(favourites => {
-        res.json(favourites);
-    })
-    .catch(err => {
-        res.json(err);
+    UserFavourite.findOne({userId: req.user.googleId})
+    .then(record => {
+        if (record) {
+            res.json(record.favourites);
+        } else {
+            res.json({});
+        }
     })
 });
 
 
 /* POST a favourite */
 router.post('/', function(req, res, next) {
-    Favourite.create(req.body)
-    .then(favourite => {
-        res.json(favourite)
-        .catch(err => res.json(err));
+    UserFavourite.findOne({userId: req.user.googleId})
+    .then(record => {
+        if (record) {
+            record.favourites.push({...req.body});
+            record.save();
+            res.json(record);
+        } else {
+            let newRecord = new UserFavourite();
+            newRecord.userId = req.user.googleId;
+            newRecord.favourites.push({...req.body});
+            newRecord.save();
+            res.json(newRecord);
+        }
     })
 });
 
 /* DELETE a favourite */
 router.delete('/:id', function(req, res, next) {
-    console.log(req.params.id);
-    Favourite.findOneAndDelete({id: req.params.id})
-    .then(data => {
-        res.json(data);
+    UserFavourite.findOne({userId: req.user.googleId})
+    .then(record => {
+        if (record) {
+            let favourites = record.favourites;
+            let index = favourites.findIndex(favourite => favourite.id === req.params.id);
+            record.favourites.splice(index, 1);
+            record.save()
+            .then(() => {
+                res.json({
+                    message: 'item deleted succesfully'
+                });
+            });
+        } else {
+            res.json({
+                error: 'no item to delete with this id'
+            })
+        }
     })
-    .catch(err => {
-        res.json(err);
-    });
 });
 
 module.exports = router;

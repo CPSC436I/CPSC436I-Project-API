@@ -1,48 +1,49 @@
 require('dotenv').config();
-var passportSetup = require('./config/passports-setup');
 var mongoose = require('mongoose');
-var cookieSession = require('cookie-session');
-var passport = require('passport');
-
-var createError = require('http-errors');
 var express = require('express');
 var cors = require('cors');
-var path = require('path');
 var cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
+const session = require('express-session');
+const bodyParser = require('body-parser');
 var logger = require('morgan');
+var app = express();
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 var favouritesRouter = require('./routes/favourites');
 var videosRouter = require('./routes/videos');
 var authRoutes = require('./routes/auth');
 
-var dbURI = process.env.DB_URI;
-var cookieKey = process.env.cookieKey;
+app.use(cookieSession({
+  maxAge: 24*60*60*100,
+  keys: ['secret-key']
+}));
 
-var app = express();
-
+const passport = require('passport');
+require('./config/passports-setup');
 app.use(passport.initialize());
 app.use(passport.session());
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+// Connect to mongodb
+mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Successfully connected to mongodb'))
+  .catch(err => console.log(err));
 
-// connect to mongodb
-mongoose.connect(dbURI, () => {
-  console.log('connected to mongodb');
-})
-
+// Middleware
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}));
 app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(session({
+  secret: 'secretcode',
+  saveUninitialized: true,
+  resave: true,
+}));
+app.use(cookieParser('secretcode'));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+// routes
 app.use('/favourites', favouritesRouter);
 app.use('/findVideos', videosRouter);
 app.use('/auth', authRoutes);
@@ -62,15 +63,5 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
-app.use(cookieSession({
-    // one day in milliseconds
-    maxAge: 24 * 60 * 60 * 1000,
-    // encrypt cookie id key
-    keys: [cookieKey]
-}))
-
-// initialize passport
-
 
 module.exports = app;
