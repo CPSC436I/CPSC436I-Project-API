@@ -12,6 +12,7 @@ var app = express();
 var favouritesRouter = require('./routes/favourites');
 var videosRouter = require('./routes/videos');
 var authRoutes = require('./routes/auth');
+var placesRouter = require('./routes/places');
 
 app.use(cookieSession({
   maxAge: 24*60*60*100,
@@ -33,6 +34,7 @@ app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true,
 }));
+
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -46,6 +48,7 @@ app.use(cookieParser('secretcode'));
 // routes
 app.use('/favourites', favouritesRouter);
 app.use('/findVideos', videosRouter);
+app.use('/findPlaces', placesRouter);
 app.use('/auth', authRoutes);
 
 // catch 404 and forward to error handler
