@@ -5,26 +5,6 @@ const { Client } = require('@googlemaps/google-maps-services-js');
 const client = new Client({});
 let axiosInstance = axios.create({});
 
-function getPlacePhoto (place) {
-  return client.placePhoto({
-    params: {
-      photoreference: place.photos[0].photo_reference,
-      key: 'AIzaSyAKDqQlGYP74UfAeSQDG6h9bKrN6hA0wAA',
-      maxheight: 500
-    },
-    responseType: 'arraybuffer'
-  }, axiosInstance)
-    .then(photo => {
-      let url = 'https://' + photo.request.socket._host + photo.request.path;
-      return url;
-    })
-    .catch(err => {
-      console.log(')))))))))))))' + err);
-    });
-  // var photos = place.photos;
-  // return photos;
-}
-
 async function compactPlace (place, query) {
   if (place.photos) {
     let photoObj;
@@ -50,7 +30,6 @@ async function compactPlace (place, query) {
         resolve(compactedPlaceObj);
       });
     } else {
-      console.log('<<<<<<<< ');
       return new Promise((resolve, reject) => {
         resolve({
           name: 'Random Photo',
@@ -74,15 +53,8 @@ async function getPlaceDetails (coordinates, query) {
       },
       timeout: 1000
     });
-  // let promiseArray = Promise.all(placeNearByObj.data.results.map(place => {
-  //   // Called correctly: called on all 20 objects
-  //   compactPlace(place);
-  // }));
-  // setTimeout(() => console.log('3------------- ' + Object.values(promiseArray)), 5000); // WRONG: values of resolved array are nothing
-  // let promiseArray = compactPlace(placeNearByObj.data.results[0]);
   let promiseArray = [];
   placeNearByObj.data.results.forEach(async (place, index) => {
-    console.log('------------ ' + index);
     let photoObj = compactPlace(place, query);
     promiseArray.push(photoObj);
   });
@@ -119,7 +91,6 @@ async function callback (req, res) {
   } else {
     return res.status(400).json('Something went wrong');
   }
-  // let idArray = response.data.items.map(videoObj => videoObj.id.videoId);
 }
 router.post('/', function (req, res, next) {
   callback(req, res);
