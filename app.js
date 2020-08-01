@@ -30,7 +30,7 @@ mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: process.env.Client_URI,
   credentials: true,
 }));
 app.use(logger('dev'));
