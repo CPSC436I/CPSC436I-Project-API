@@ -12,6 +12,7 @@ var app = express();
 var favouritesRouter = require('./routes/favourites');
 var videosRouter = require('./routes/videos');
 var authRoutes = require('./routes/auth');
+var tripsRouter = require('./routes/trips');
 
 app.use(cookieSession({
   maxAge: 24*60*60*100,
@@ -45,6 +46,7 @@ app.use(cookieParser('secretcode'));
 
 // routes
 app.use('/favourites', favouritesRouter);
+app.use('/trips', tripsRouter);
 app.use('/findVideos', videosRouter);
 app.use('/auth', authRoutes);
 
