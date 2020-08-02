@@ -5,17 +5,30 @@ const { Client } = require('@googlemaps/google-maps-services-js');
 const client = new Client({});
 let axiosInstance = axios.create({});
 
+let nextPageToken = '';
+
 async function compactPlace (place, query) {
   if (place.photos) {
     let photoObj;
-    photoObj = await client.placePhoto({
-      params: {
-        photoreference: place.photos[0].photo_reference,
-        key: 'AIzaSyAKDqQlGYP74UfAeSQDG6h9bKrN6hA0wAA',
-        maxheight: 500
-      },
-      responseType: 'arraybuffer'
-    }, axiosInstance);
+    try {
+      photoObj = await client.placePhoto({
+        params: {
+          photoreference: place.photos[0].photo_reference,
+          key: 'AIzaSyAKDqQlGYP74UfAeSQDG6h9bKrN6hA0wAA',
+          maxheight: 500
+        },
+        responseType: 'arraybuffer'
+      }, axiosInstance);
+    } catch (err) {
+      photoObj = await client.placePhoto({
+        params: {
+          photoreference: place.photos[0].photo_reference,
+          key: 'AIzaSyAKDqQlGYP74UfAeSQDG6h9bKrN6hA0wAA',
+          maxheight: 500
+        },
+        responseType: 'arraybuffer'
+      }, axiosInstance);
+    }
     let url = 'https://' + photoObj.request.socket._host + photoObj.request.path;
     let shortenedUrl = photoObj.request.path.substr(3);
     let compactedPlaceObj = {
@@ -40,20 +53,27 @@ async function compactPlace (place, query) {
   }
 }
 
-async function getPlaceDetails (coordinates, query) {
+async function getPlaceDetails (coordinates, query, pageToken = '') {
   let placeNearByObj = await client
     .placesNearby({
       params: {
         location: { lat: coordinates.lat, lng: coordinates.lng },
         key: 'AIzaSyAKDqQlGYP74UfAeSQDG6h9bKrN6hA0wAA',
-        radius: 25000,
+        radius: 50000,
         keyword: 'attractions',
         inputtype: 'textquery',
-        language: 'en'
+        language: 'en',
+        pagetoken: nextPageToken
       },
       timeout: 1000
     });
   let promiseArray = [];
+  let potentialPageToken = placeNearByObj.data.next_page_token;
+  if (potentialPageToken) {
+    nextPageToken = potentialPageToken;
+  } else {
+    nextPageToken = '';
+  }
   placeNearByObj.data.results.forEach(async (place, index) => {
     let photoObj = compactPlace(place, query);
     promiseArray.push(photoObj);
@@ -85,9 +105,23 @@ async function callback (req, res) {
     coordinates.lng = preCoordinates[0].geometry.location.lng;
   }
   console.log('2~~~~~~~~~ COORDINATES: ' + coordinates.lat + ' AND ' + coordinates.lng);
-  let response = await getPlaceDetails(coordinates, req.body.destination);
+  let response;
+  if (req.body.nextPageToken) {
+    response = await getPlaceDetails(coordinates, req.body.destination, req.body.nextPageToken);
+  } else {
+    response = await getPlaceDetails(coordinates, req.body.destination);
+  }
   if (response.length > 0) {
-    return res.status(200).json({ places: response });
+    if (nextPageToken !== '') {
+      return res.status(200).json({
+        places: response,
+        pageToken: nextPageToken
+      });
+    } else {
+      return res.status(200).json({
+        places: response
+      });
+    }
   } else {
     return res.status(400).json('Something went wrong');
   }
