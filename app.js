@@ -18,7 +18,7 @@ app.use(cookieSession({
   maxAge: 24*60*60*100,
   keys: ['secret-key'],
   sameSite: 'none',
-  secure: true
+  secure: 'auto'
 }));
 
 const passport = require('passport');
@@ -46,7 +46,7 @@ app.use(session({
   resave: true,
   
   cookie: {
-    secure: true,
+    secure: 'auto',
     sameSite: 'none'
   }
 }));
