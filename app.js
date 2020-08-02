@@ -44,6 +44,11 @@ app.use(session({
   secret: 'secretcode',
   saveUninitialized: true,
   resave: true,
+  
+  cookie: {
+    secure: true,
+    sameSite: 'none'
+  }
 }));
 app.use(cookieParser('secretcode'));
 
