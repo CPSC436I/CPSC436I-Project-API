@@ -5,7 +5,7 @@ const User = require('../models/User');
 
 // get current auth user
 router.get('/user', (req, res) => {
-    // console.log(req.user);
+    console.log(req.session);
     res.send(req.user);
 });
 
@@ -26,34 +26,34 @@ router.get("/logout", (req, res, next) => {
     res.send("Logout successful");
 });
 
-// router.post("/login", (req, res, next) => {
-//     passport.authenticate("local", (err, user, info) => {
-//         if (err) throw err;
-//         if (!user) res.send("No User Exists");
-//         else {
-//             req.logIn(user, (err) => {
-//                 if (err) throw err;
-//                 res.send("Successfully Authenticated");
-//             });
-//         }
-//     })(req, res, next);
-// });
+router.post("/login", (req, res, next) => {
+    passport.authenticate("local", (err, user, info) => {
+        if (err) throw err;
+        if (!user) res.send("No User Exists");
+        else {
+            req.logIn(user, (err) => {
+                if (err) throw err;
+                res.send("Successfully Authenticated");
+            });
+        }
+    })(req, res, next);
+});
 
 
-// router.post('/register', (req, res) => {
-//     User.findOne({ username: req.body.username }, async (err, doc) => {
-//         if (err) throw err;
-//         if (doc) res.send("User already exists");
-//         if (!doc) {
-//             const hashedPassword = await bcrypt.hash(req.body.password, 10);
-//             const newUser = new User({
-//                 username: req.body.username,
-//                 password: hashedPassword
-//             });
-//             await newUser.save();
-//             res.send('User created');
-//         }
-//     })
-// });
+router.post('/register', (req, res) => {
+    User.findOne({ username: req.body.username }, async (err, doc) => {
+        if (err) throw err;
+        if (doc) res.send("User already exists");
+        if (!doc) {
+            const hashedPassword = await bcrypt.hash(req.body.password, 10);
+            const newUser = new User({
+                username: req.body.username,
+                password: hashedPassword
+            });
+            await newUser.save();
+            res.send('User created');
+        }
+    })
+});
 
 module.exports = router;

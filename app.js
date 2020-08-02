@@ -2,9 +2,8 @@ require('dotenv').config();
 var mongoose = require('mongoose');
 var express = require('express');
 var cors = require('cors');
-var cookieParser = require('cookie-parser');
-const cookieSession = require('cookie-session');
 const session = require('express-session');
+const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser');
 var logger = require('morgan');
 var app = express();
@@ -18,13 +17,15 @@ app.use(cookieSession({
   maxAge: 24*60*60*100,
   keys: ['secret-key'],
   sameSite: 'none',
-  secure: 'auto'
+  secure: false,
+  httpOnly: false
 }));
 
 const passport = require('passport');
-require('./config/passports-setup');
 app.use(passport.initialize());
 app.use(passport.session());
+
+require('./config/passports-setup');
 
 // Connect to mongodb
 mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -40,17 +41,6 @@ app.use(cors({
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(session({
-  secret: 'secretcode',
-  saveUninitialized: true,
-  resave: true,
-  
-  cookie: {
-    secure: 'auto',
-    sameSite: 'none'
-  }
-}));
-app.use(cookieParser('secretcode'));
 
 // routes
 app.use('/favourites', favouritesRouter);
