@@ -16,7 +16,9 @@ var placesRouter = require('./routes/places');
 
 app.use(cookieSession({
   maxAge: 24*60*60*100,
-  keys: ['secret-key']
+  keys: ['secret-key'],
+  sameSite: 'none',
+  secure: true
 }));
 
 const passport = require('passport');
