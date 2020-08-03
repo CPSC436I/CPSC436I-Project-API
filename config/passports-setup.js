@@ -3,15 +3,14 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const localStrategy = require("passport-local").Strategy;
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const FacebookStrategy = require("passport-facebook").Strategy;
 const passport = require('passport');
-const { google } = require("googleapis");
 
 passport.serializeUser((user, cb) => {
   cb(null, user);
 });
 
 passport.deserializeUser((id, cb) => {
+  console.log('deserializing user');
   User.findOne({ _id: id }, (err, user) => {
     cb(err, user);
   });
@@ -45,7 +44,6 @@ passport.use(
     User.findOne({ googleId: profile.id }).then((currentUser) => {
       if (currentUser) {
         // already have the user registered 
-        console.log('already have this user');
         done(null, currentUser);
       } else {
         // create a new user
@@ -53,7 +51,6 @@ passport.use(
           username: profile.displayName,
           googleId: profile.id
         }).save().then((newUser) => {
-          console.log('new user created: ' + newUser);
           done(null, newUser);
         });
       }

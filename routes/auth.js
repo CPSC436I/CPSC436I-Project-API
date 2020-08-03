@@ -17,7 +17,9 @@ router.get('/google', passport.authenticate('google', {
 
 // callback route for google to redirect to
 router.get('/google/redirect', passport.authenticate('google'), (req, res) => {
-    // res.send(req.user);
+    console.log(req.user);
+    // res.cookie('userid', user.googleId, { maxAge: 2592000000 });    
+    console.log(req.session);
     res.redirect(`${process.env.Client_URI}`)
 });
 

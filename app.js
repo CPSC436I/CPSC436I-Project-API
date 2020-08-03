@@ -3,7 +3,6 @@ var mongoose = require('mongoose');
 var express = require('express');
 var cors = require('cors');
 const session = require('express-session');
-const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser');
 var logger = require('morgan');
 var app = express();
@@ -15,25 +14,6 @@ var placesRouter = require('./routes/places');
 var restaurantsRouter = require('./routes/restaurants');
 var eventsRouter = require('./routes/events');
 
-app.use(cookieSession({
-  maxAge: 24*60*60*100,
-  keys: ['secret-key'],
-  sameSite: 'none',
-  secure: false,
-  httpOnly: false
-}));
-
-const passport = require('passport');
-app.use(passport.initialize());
-app.use(passport.session());
-
-require('./config/passports-setup');
-
-// Connect to mongodb
-mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Successfully connected to mongodb'))
-  .catch(err => console.log(err));
-
 // Middleware
 app.use(cors({
   origin: process.env.Client_URI,
@@ -43,6 +23,27 @@ app.use(cors({
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+
+// Passport setup
+require('./config/passports-setup');
+const passport = require('passport');
+
+app.use(session({
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 24*60*60*100,
+  }
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Connect to mongodb
+mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Successfully connected to mongodb'))
+  .catch(err => console.log(err));
 
 // routes
 app.use('/favourites', favouritesRouter);
