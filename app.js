@@ -13,6 +13,17 @@ var videosRouter = require('./routes/videos');
 var authRoutes = require('./routes/auth');
 var placesRouter = require('./routes/places');
 
+// Middleware
+app.use(cors({
+  origin: process.env.Client_URI,
+  credentials: true,
+}));
+
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+
+// Passport setup
 require('./config/passports-setup');
 const passport = require('passport');
 
@@ -27,25 +38,13 @@ app.use(session({
   }
 }));
 
-
 app.use(passport.initialize());
 app.use(passport.session());
-
 
 // Connect to mongodb
 mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Successfully connected to mongodb'))
   .catch(err => console.log(err));
-
-// Middleware
-app.use(cors({
-  origin: process.env.Client_URI,
-  credentials: true,
-}));
-
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
 
 // routes
 app.use('/favourites', favouritesRouter);
