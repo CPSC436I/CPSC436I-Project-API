@@ -13,17 +13,18 @@ var videosRouter = require('./routes/videos');
 var authRoutes = require('./routes/auth');
 var placesRouter = require('./routes/places');
 
+const passport = require('passport');
+
 app.use(cookieSession({
   maxAge: 24*60*60*100,
   keys: ['secret-key'],
-  sameSite: 'none',
-  secure: false,
-  httpOnly: false
+  // sameSite: 'none',
+  // secure: true,
 }));
 
-const passport = require('passport');
 app.use(passport.initialize());
 app.use(passport.session());
+
 
 require('./config/passports-setup');
 
