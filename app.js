@@ -18,8 +18,10 @@ const passport = require('passport');
 app.use(cookieSession({
   maxAge: 24*60*60*100,
   keys: ['secret-key'],
-  // sameSite: 'none',
-  // secure: true,
+  resave: false,
+  saveUninitialized: false,
+  sameSite: false,
+  secure: true,
 }));
 
 app.use(passport.initialize());
