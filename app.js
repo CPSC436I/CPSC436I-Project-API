@@ -11,6 +11,8 @@ var favouritesRouter = require('./routes/favourites');
 var videosRouter = require('./routes/videos');
 var authRoutes = require('./routes/auth');
 var placesRouter = require('./routes/places');
+var restaurantsRouter = require('./routes/restaurants');
+var eventsRouter = require('./routes/events');
 
 // Middleware
 app.use(cors({
@@ -47,6 +49,8 @@ mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology
 app.use('/favourites', favouritesRouter);
 app.use('/findVideos', videosRouter);
 app.use('/findPlaces', placesRouter);
+app.use('/findRestaurants', restaurantsRouter);
+app.use('/findEvents', eventsRouter);
 app.use('/auth', authRoutes);
 
 // catch 404 and forward to error handler
