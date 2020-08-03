@@ -3,7 +3,6 @@ var mongoose = require('mongoose');
 var express = require('express');
 var cors = require('cors');
 const session = require('express-session');
-// const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser');
 var logger = require('morgan');
 var app = express();
@@ -34,6 +33,7 @@ app.use(session({
   cookie: {
     secure: true,
     sameSite: 'none',
+    domain: 'herokuapp.com',
     maxAge: 24*60*60*100,
   }
 }));
