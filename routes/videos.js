@@ -7,20 +7,33 @@ async function query (req) {
     version: 'v3',
     auth: 'AIzaSyCtPGmjQdjKTo5hJMiPnBcx2b4Sy1vXZpY'
   });
-  const response = await youtube.search.list({
-    part: 'id,snippet',
-    fields: 'items/id',
-    q: `travel ${req.body.destination}`,
-    maxResults: 6
-  });
-  return response;
+  if (req.body.nextPageToken === '') {
+    const response = await youtube.search.list({
+      part: 'id,snippet',
+      fields: 'items/id,nextPageToken',
+      q: `travel ${req.body.destination}`,
+      maxResults: 6
+    });
+    return response;
+  } else {
+    const response = await youtube.search.list({
+      part: 'id,snippet',
+      fields: 'items/id,nextPageToken',
+      q: `travel ${req.body.destination}`,
+      maxResults: 12,
+      pageToken: req.body.nextPageToken
+    });
+    return response;
+  }
+  
 }
 
 async function callback (req, res) {
   let response = await query(req);
   let idArray = response.data.items.map(videoObj => videoObj.id.videoId);
   return res.status(200).json({
-    ids: idArray
+    ids: idArray,
+    nextPageToken: response.data.nextPageToken
   });
 }
 
