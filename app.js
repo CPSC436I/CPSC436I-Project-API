@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var express = require('express');
 var cors = require('cors');
 const session = require('express-session');
-const cookieSession = require('cookie-session');
+// const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser');
 var logger = require('morgan');
 var app = express();
@@ -13,22 +13,24 @@ var videosRouter = require('./routes/videos');
 var authRoutes = require('./routes/auth');
 var placesRouter = require('./routes/places');
 
+require('./config/passports-setup');
 const passport = require('passport');
 
-app.use(cookieSession({
-  maxAge: 24*60*60*100,
-  keys: ['secret-key'],
+app.use(session({
+  secret: 'secret',
   resave: false,
   saveUninitialized: false,
-  sameSite: false,
-  secure: true,
+  cookie: {
+    secure: true,
+    sameSite: 'none',
+    maxAge: 24*60*60*100,
+  }
 }));
+
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-
-require('./config/passports-setup');
 
 // Connect to mongodb
 mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })

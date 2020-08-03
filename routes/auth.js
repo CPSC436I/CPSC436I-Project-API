@@ -5,7 +5,7 @@ const User = require('../models/User');
 
 // get current auth user
 router.get('/user', (req, res) => {
-    // console.log(req.session);
+    console.log(req.session);
     res.send(req.user);
 });
 
