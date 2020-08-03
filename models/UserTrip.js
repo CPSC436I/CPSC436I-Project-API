@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var userTripSchema = new Schema({
-  userId: String,
+  tripId: String,
   name: String,
   numberOfDays: Number,
   days: [
