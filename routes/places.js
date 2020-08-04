@@ -63,7 +63,7 @@ async function getPlaceDetails (coordinates, query, pageToken = '') {
         keyword: 'attractions',
         inputtype: 'textquery',
         language: 'en',
-        pagetoken: nextPageToken
+        pagetoken: pageToken
       },
       timeout: 1000
     });
@@ -106,10 +106,13 @@ async function callback (req, res) {
   }
   console.log('2~~~~~~~~~ COORDINATES: ' + coordinates.lat + ' AND ' + coordinates.lng);
   let response;
-  if (req.body.nextPageToken) {
-    response = await getPlaceDetails(coordinates, req.body.destination, req.body.nextPageToken);
-  } else {
+  console.log('3~~~~~~~~~ got here: ' + coordinates.lat + ' AND ' + coordinates.lng);
+  if (req.body.nextPageToken === undefined) {
+    console.log('4~~~~~~~~~ got here: ' + coordinates.lat + ' AND ' + coordinates.lng);
     response = await getPlaceDetails(coordinates, req.body.destination);
+  } else {
+    response = await getPlaceDetails(coordinates, req.body.destination, req.body.nextPageToken);
+
   }
   if (response.length > 0) {
     if (nextPageToken !== '') {
