@@ -63,7 +63,7 @@ async function getPlaceDetails (coordinates, query, pageToken = '') {
         keyword: 'attractions',
         inputtype: 'textquery',
         language: 'en',
-        pagetoken: nextPageToken
+        pagetoken: pageToken
       },
       timeout: 1000
     });
@@ -96,7 +96,6 @@ async function getPlaceCoordinates (location) {
 }
 
 async function callback (req, res) {
-  console.log('1~~~~~~~~~ COORDINATES: ' + req.body.destination);
   let preCoordinates = await getPlaceCoordinates(req.body.destination);
   preCoordinates = preCoordinates.data.candidates;
   let coordinates = {};
@@ -104,12 +103,12 @@ async function callback (req, res) {
     coordinates.lat = preCoordinates[0].geometry.location.lat;
     coordinates.lng = preCoordinates[0].geometry.location.lng;
   }
-  console.log('2~~~~~~~~~ COORDINATES: ' + coordinates.lat + ' AND ' + coordinates.lng);
   let response;
-  if (req.body.nextPageToken) {
-    response = await getPlaceDetails(coordinates, req.body.destination, req.body.nextPageToken);
-  } else {
+  if (req.body.nextPageToken === undefined) {
     response = await getPlaceDetails(coordinates, req.body.destination);
+  } else {
+    response = await getPlaceDetails(coordinates, req.body.destination, req.body.nextPageToken);
+
   }
   if (response.length > 0) {
     if (nextPageToken !== '') {
