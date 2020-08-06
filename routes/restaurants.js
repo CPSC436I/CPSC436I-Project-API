@@ -3,7 +3,9 @@ var axios = require('axios');
 const { Client } = require('@googlemaps/google-maps-services-js');
 const client = new Client({});
 let axiosInstance = axios.create({});
-const yelpClient = yelp.client('IL2FAbCiYXXpcxEYV6PQVmLctUKFbk5kw-jNKFlx36oMrKjl87A2r6-h8Vs48JiCvyydd7bo0E6ftscdmBEEOC646YYsQCH70GitQwUpR3Yodoa-pAuQREa2LTIbX3Yx');
+let YELP_API_KEY = process.env.Yelp_apiKey;
+let GOOGLE_API_KEY = process.env.Google_apiKey;
+const yelpClient = yelp.client(YELP_API_KEY);
 var express = require('express');
 var router = express.Router();
 
@@ -15,7 +17,7 @@ async function getPlaceCoordinates (location) {
       params: {
         input: location,
         inputtype: 'textquery',
-        key: 'AIzaSyAKDqQlGYP74UfAeSQDG6h9bKrN6hA0wAA',
+        key: GOOGLE_API_KEY,
         fields: ['formatted_address', 'geometry']
       },
       timeout: 1000
