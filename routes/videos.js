@@ -1,11 +1,12 @@
 var express = require('express');
 const { google } = require('googleapis');
 var router = express.Router();
+let YOUTUBE_API_KEY = process.env.Youtube_apiKey;
 
 async function query (req) {
   const youtube = google.youtube({
     version: 'v3',
-    auth: 'AIzaSyCtPGmjQdjKTo5hJMiPnBcx2b4Sy1vXZpY'
+    auth: YOUTUBE_API_KEY
   });
   if (req.body.nextPageToken === '') {
     const response = await youtube.search.list({

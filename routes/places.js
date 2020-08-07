@@ -4,6 +4,7 @@ var router = express.Router();
 const { Client } = require('@googlemaps/google-maps-services-js');
 const client = new Client({});
 let axiosInstance = axios.create({});
+let GOOGLE_API_KEY = process.env.Google_apiKey;
 
 let nextPageToken = '';
 
@@ -14,7 +15,7 @@ async function compactPlace (place, query) {
       photoObj = await client.placePhoto({
         params: {
           photoreference: place.photos[0].photo_reference,
-          key: 'AIzaSyAKDqQlGYP74UfAeSQDG6h9bKrN6hA0wAA',
+          key: GOOGLE_API_KEY,
           maxheight: 500
         },
         responseType: 'arraybuffer'
@@ -23,7 +24,7 @@ async function compactPlace (place, query) {
       photoObj = await client.placePhoto({
         params: {
           photoreference: place.photos[0].photo_reference,
-          key: 'AIzaSyAKDqQlGYP74UfAeSQDG6h9bKrN6hA0wAA',
+          key: GOOGLE_API_KEY,
           maxheight: 500
         },
         responseType: 'arraybuffer'
@@ -58,7 +59,7 @@ async function getPlaceDetails (coordinates, query, pageToken = '') {
     .placesNearby({
       params: {
         location: { lat: coordinates.lat, lng: coordinates.lng },
-        key: 'AIzaSyAKDqQlGYP74UfAeSQDG6h9bKrN6hA0wAA',
+        key: GOOGLE_API_KEY,
         radius: 50000,
         keyword: 'attractions',
         inputtype: 'textquery',
@@ -87,7 +88,7 @@ async function getPlaceCoordinates (location) {
       params: {
         input: location,
         inputtype: 'textquery',
-        key: 'AIzaSyAKDqQlGYP74UfAeSQDG6h9bKrN6hA0wAA',
+        key: GOOGLE_API_KEY,
         fields: ['formatted_address', 'geometry']
       },
       timeout: 1000
